@@ -7,6 +7,8 @@ import {
   Alert,
   Platform,
   Pressable,
+  StyleSheet,
+  ActivityIndicator,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { Audio } from "expo-av";
@@ -15,12 +17,13 @@ import { useRouter } from "expo-router";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useCompareDTW } from '../../../hooks/useCompareDTW';
 
 const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
   <Animatable.View
     animation="fadeInUp"
     duration={600}
-    className="flex-row items-center bg-green-50 rounded-lg p-3 mt-4 shadow-sm border border-green-100"
+    style={styles.audioBarContainer}
   >
     <Animatable.View
       animation={isPlaying ? "pulse" : undefined}
@@ -36,7 +39,7 @@ const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
     </Animatable.View>
     <Text
       numberOfLines={1}
-      className="flex-1 mr-2 text-lg font-medium text-green-800"
+      style={styles.audioTitle}
     >
       {audio.name || "Unnamed Audio"}
     </Text>
@@ -44,7 +47,7 @@ const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
       <Animatable.View animation="bounceIn" duration={300}>
         <TouchableOpacity
           onPress={onPause}
-          className="bg-red-500 rounded-full w-10 h-10 justify-center items-center"
+          style={styles.pauseButton}
         >
           <Ionicons name="pause" size={24} color="white" />
         </TouchableOpacity>
@@ -53,7 +56,7 @@ const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
       <Animatable.View animation="bounceIn" duration={300}>
         <TouchableOpacity
           onPress={onPlay}
-          className="bg-green-600 rounded-full w-10 h-10 justify-center items-center"
+          style={styles.playButton}
         >
           <Ionicons name="play" size={24} color="white" />
         </TouchableOpacity>
@@ -73,6 +76,7 @@ export default function Recitation() {
   const router = useRouter();
   const [recording, setRecording] = useState();
   const [isRecording, setIsRecording] = useState(false);
+  const compareDTWMutation = useCompareDTW();
 
   const [originalRecording, setOriginalRecording] = useState();
   const [userRecording, setUserRecording] = useState();
@@ -166,11 +170,44 @@ export default function Recitation() {
     }
   };
 
-  const similaritySearch = () => {
-    Alert.alert(
-      "Similarity Search",
-      "Similarity search functionality will be integrated here."
-    );
+  const similaritySearch = async () => {
+    if (!originalAudio || !userAudio) {
+      Alert.alert(
+        "Missing Audio",
+        "Please upload or record both original and user audio files."
+      );
+      return;
+    }
+
+    try {
+      const result = await compareDTWMutation.mutateAsync({
+        originalAudio: {
+          ...originalAudio,
+          type: originalAudio.name.endsWith('.mp3') ? 'audio/mp3' : 'audio/ogg'
+        },
+        userAudio: {
+          ...userAudio,
+          type: userAudio.name.endsWith('.mp3') ? 'audio/mp3' : 'audio/ogg'
+        }
+      });
+
+      // Check if result is valid and has the expected properties
+      if (result && typeof result.similarity_score === 'number') {
+        Alert.alert(
+          "Similarity Results",
+          `Score: ${result.similarity_score.toFixed(2)}%\n\nInterpretation: ${result.interpretation || "No interpretation available"}`
+        );
+      } else {
+        throw new Error('Invalid response format from comparison service');
+      }
+    } catch (error) {
+      console.error('Full error details:', error);
+      
+      Alert.alert(
+        "Error",
+        "An error occurred while comparing the audio files. Please try again later."
+      );
+    }
   };
 
   async function startRecording(isOriginal) {
@@ -266,33 +303,33 @@ export default function Recitation() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-green-50">
-      <View className="flex-row items-center px-4  py-4 border-b bg-green-50 border-gray-200">
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-        <Ionicons name="arrow-back" size={24} color="#15803d" />
+          <Ionicons name="arrow-back" size={24} color="#15803d" />
         </TouchableOpacity>
-        <Text className="flex-1 text-lg text-green-800 font-semibold text-center">
+        <Text style={styles.headerTitle}>
           Recitation
         </Text>
-        <View className="w-6" />
+        <View style={styles.headerSpacer} />
       </View>
 
       <ScrollView
-        contentContainerStyle={{ padding: 20 ,height:'100%', backgroundColor:'white'}}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <Text className="text-lg font-bold  mt-4">Original Audio</Text>
-        <View className="flex-row justify-between mt-4">
+        <Text style={styles.sectionTitle}>Original Audio</Text>
+        <View style={styles.optionsRow}>
           {!isOriginalUpload && (
             <TouchableOpacity
               onPress={() => {
                 pickAudio(setOriginalAudio);
                 setIsOriginalUpload(true);
               }}
-              className="border-2 border-gray-100  py-4 rounded-lg flex-1 items-center justify-center mr-2 "
+              style={styles.uploadButton}
             >
               <MaterialIcons name="upload-file" size={24} color="#16a34a" />
-              <Text className=" text-lg mt-2">Upload</Text>
+              <Text style={styles.buttonText}>Upload</Text>
             </TouchableOpacity>
           )}
 
@@ -300,13 +337,11 @@ export default function Recitation() {
             <Animatable.View
               animation={isOriginalRecording ? "pulse" : undefined}
               iterationCount="infinite"
-              className="flex-1"
+              style={styles.flexOne}
             >
               <TouchableOpacity
                 onPress={() => recordAudio(true)}
-                className={`border-2 ${
-                  isOriginalRecording ? "border-red-200" : "border-gray-100"
-                } py-4 rounded-lg flex-1 items-center justify-center `}
+                style={isOriginalRecording ? styles.recordingButton : styles.recordButton}
               >
                 <Ionicons
                   name={isOriginalRecording ? "stop" : "mic"}
@@ -314,9 +349,7 @@ export default function Recitation() {
                   color={isOriginalRecording ? "#ef4444" : "#16a34a"}
                 />
                 <Text
-                  className={`text-lg mt-2 ${
-                    isOriginalRecording ? "text-red-200" : "text-black"
-                  }`}
+                  style={isOriginalRecording ? styles.recordingText : styles.buttonText}
                 >
                   {isOriginalRecording ? "Recording..." : "Record"}
                 </Text>
@@ -334,18 +367,18 @@ export default function Recitation() {
           />
         )}
 
-        <Text className="text-lg font-bold  mt-6">User Audio</Text>
-        <View className="flex-row justify-between mt-4">
+        <Text style={styles.sectionTitleSecond}>User Audio</Text>
+        <View style={styles.optionsRow}>
           {!isUserUpload && (
             <TouchableOpacity
               onPress={() => {
                 pickAudio(setUserAudio);
                 setIsUserUpload(true);
               }}
-              className="border-2 border-gray-100 py-4 rounded-lg flex-1 items-center justify-center mr-2 "
+              style={styles.uploadButton}
             >
               <MaterialIcons name="upload-file" size={24} color="#16a34a" />
-              <Text className=" text-lg mt-2">Upload</Text>
+              <Text style={styles.buttonText}>Upload</Text>
             </TouchableOpacity>
           )}
 
@@ -353,13 +386,11 @@ export default function Recitation() {
             <Animatable.View
               animation={isUserRecording ? "pulse" : undefined}
               iterationCount="infinite"
-              className="flex-1"
+              style={styles.flexOne}
             >
               <TouchableOpacity
                 onPress={() => recordAudio(false)}
-                className={`border-2 ${
-                  isUserRecording ? "border-red-200" : "border-gray-100"
-                } py-4 rounded-lg flex-1 items-center justify-center `}
+                style={isUserRecording ? styles.recordingButton : styles.recordButton}
               >
                 <Ionicons
                   name={isUserRecording ? "stop" : "mic"}
@@ -367,9 +398,7 @@ export default function Recitation() {
                   color={isUserRecording ? "#ef4444" : "#16a34a"}
                 />
                 <Text
-                  className={`text-lg mt-2 ${
-                    isUserRecording ? "text-red-500" : "text-black"
-                  }`}
+                  style={isUserRecording ? styles.recordingText : styles.buttonText}
                 >
                   {isUserRecording ? "Recording..." : "Record"}
                 </Text>
@@ -389,14 +418,167 @@ export default function Recitation() {
 
         <TouchableOpacity
           onPress={similaritySearch}
-          className="border-2 border-gray-100 py-4 rounded-lg items-center mt-6 "
+          disabled={compareDTWMutation.isPending || !originalAudio || !userAudio}
+          style={[
+            styles.compareButton,
+            (!originalAudio || !userAudio) && styles.disabledButton
+          ]}
         >
-          <Text className=" text-lg">
-            <MaterialIcons name="search" size={20} color="#16a34a" /> Similarity
-            Search
-          </Text>
+          {compareDTWMutation.isPending ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color="#16a34a" />
+              <Text style={styles.buttonText}>Comparing...</Text>
+            </View>
+          ) : (
+            <View style={styles.buttonContentRow}>
+              <MaterialIcons name="search" size={20} color="#16a34a" />
+              <Text style={styles.buttonText}>Compare Audio</Text>
+            </View>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#f0fdf4', // green-50
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    backgroundColor: '#f0fdf4', // green-50
+    borderColor: '#e5e7eb', // gray-200
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    color: '#166534', // green-800
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  scrollContent: {
+    padding: 20,
+    height: '100%',
+    backgroundColor: 'white',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  sectionTitleSecond: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 24,
+  },
+  optionsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  uploadButton: {
+    borderWidth: 2,
+    borderColor: '#f5f5f5', // gray-100
+    paddingVertical: 16,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  recordButton: {
+    borderWidth: 2,
+    borderColor: '#f5f5f5', // gray-100
+    paddingVertical: 16,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recordingButton: {
+    borderWidth: 2,
+    borderColor: '#fecaca', // red-200
+    paddingVertical: 16,
+    borderRadius: 8,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonText: {
+    fontSize: 18,
+    marginTop: 8,
+  },
+  recordingText: {
+    fontSize: 18,
+    marginTop: 8,
+    color: '#ef4444', // red-500
+  },
+  audioBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0fdf4', // green-50
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 16,
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 2,
+    borderWidth: 1,
+    borderColor: '#dcfce7', // green-100
+  },
+  audioTitle: {
+    flex: 1,
+    marginRight: 8,
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#166534', // green-800
+  },
+  playButton: {
+    backgroundColor: '#16a34a', // green-600
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pauseButton: {
+    backgroundColor: '#ef4444', // red-500
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  compareButton: {
+    borderWidth: 2,
+    borderColor: '#f5f5f5', // gray-100
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  flexOne: {
+    flex: 1,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+});
