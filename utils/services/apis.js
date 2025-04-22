@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const BASE_URL = 'https://hammad712-urdu-ocr-app.hf.space';
 const BASE_URL2 = 'https://hammad712-recitation-compare.hf.space';
+const AYAT_FINDER_URL = 'https://hammad712-ayat-finder.hf.space/query';
 
 
 const API_ENDPOINTS = {
@@ -90,5 +91,105 @@ export const compareDTW = async (originalAudio, userAudio) => {
     } else if (error.request) {
       console.error('Error request details:', error.request);
     } 
+  }
+};
+
+/**
+ * Sends a question to the Ayat Finder API and returns the answer.
+ * @param {string} question
+ * @returns {Promise<string>} The answer from the API.
+ */
+export const getAyatAnswer = async (question) => {
+  try {
+    const response = await axios.post(
+      AYAT_FINDER_URL,
+      { question },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    // The API returns { answer: "..." }
+    return response.data.answer;
+  } catch (error) {
+    console.error('Ayat Finder API Error:', error);
+    if (error.response) {
+      throw new Error(
+        `Server error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`
+      );
+    } else if (error.request) {
+      throw new Error('No response from Ayat Finder service. Please check your internet connection.');
+    } else {
+      throw new Error(`Ayat Finder request failed: ${error.message}`);
+    }
+  }
+};
+
+const QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/generate_quiz/';
+const GRADE_QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/grade_quiz/';
+
+/**
+ * Generates a quiz question from the API
+ * @param {string} search_query - The topic or context for the quiz
+ * @returns {Promise<string>} The quiz question
+ */
+export const generateQuiz = async (search_query) => {
+  try {
+    const response = await axios.post(
+      QUIZ_API_URL,
+      { search_query },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    return response.data.quiz;
+  } catch (error) {
+    console.error('Quiz Generation API Error:', error);
+    throw handleApiError(error, 'Quiz Generation');
+  }
+};
+
+/**
+ * Grades the user's answer to a quiz question
+ * @param {string} answers - The user's answer
+ * @returns {Promise<string>} The grading result
+ */
+export const gradeQuiz = async (answers) => {
+  try {
+    const response = await axios.post(
+      GRADE_QUIZ_API_URL,
+      { answers },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    return response.data.grade;
+  } catch (error) {
+    console.error('Quiz Grading API Error:', error);
+    throw handleApiError(error, 'Quiz Grading');
+  }
+};
+
+// Helper function for error handling
+const handleApiError = (error, service) => {
+  if (error.response) {
+    return new Error(
+      `${service} server error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`
+    );
+  } else if (error.request) {
+    return new Error(`No response from ${service} service. Please check your internet connection.`);
+  } else {
+    return new Error(`${service} request failed: ${error.message}`);
   }
 };

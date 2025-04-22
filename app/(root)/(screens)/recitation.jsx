@@ -74,9 +74,9 @@ export default function Recitation() {
   const [isOriginalUpload, setIsOriginalUpload] = useState(false);
   const [isUserUpload, setIsUserUpload] = useState(false);
   const router = useRouter();
-  const [recording, setRecording] = useState();
-  const [isRecording, setIsRecording] = useState(false);
+
   const compareDTWMutation = useCompareDTW();
+
 
   const [originalRecording, setOriginalRecording] = useState();
   const [userRecording, setUserRecording] = useState();
@@ -418,21 +418,21 @@ export default function Recitation() {
 
         <TouchableOpacity
           onPress={similaritySearch}
-          disabled={compareDTWMutation.isPending || !originalAudio || !userAudio}
+          disabled={compareDTWMutation.isLoading || !originalAudio || !userAudio}
           style={[
             styles.compareButton,
-            (!originalAudio || !userAudio) && styles.disabledButton
+            (compareDTWMutation.isLoading || !originalAudio || !userAudio) && styles.disabledButton
           ]}
         >
-          {compareDTWMutation.isPending ? (
+          {compareDTWMutation.isLoading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator color="#16a34a" />
-              <Text style={styles.buttonText}>Comparing...</Text>
+              <ActivityIndicator color="#16a34a" size={20} />
+              <Text style={[styles.buttonText, { marginLeft: 8, marginTop:0 }]}>Please wait, processing...</Text>
             </View>
           ) : (
             <View style={styles.buttonContentRow}>
               <MaterialIcons name="search" size={20} color="#16a34a" />
-              <Text style={styles.buttonText}>Compare Audio</Text>
+              <Text style={[styles.buttonText, { marginLeft: 8, marginTop: 0 }]}>Compare Audio</Text>
             </View>
           )}
         </TouchableOpacity>
@@ -444,7 +444,7 @@ export default function Recitation() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f0fdf4', // green-50
+    backgroundColor: '#fff', 
   },
   header: {
     flexDirection: 'row',
@@ -452,13 +452,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    backgroundColor: '#f0fdf4', // green-50
-    borderColor: '#e5e7eb', // gray-200
+    backgroundColor: '#fff', 
+    borderColor: '#e5e7eb', 
   },
   headerTitle: {
     flex: 1,
     fontSize: 18,
-    color: '#166534', // green-800
+    color: '#166534', 
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -576,9 +576,12 @@ const styles = StyleSheet.create({
   loadingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap:6,
   },
   buttonContentRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

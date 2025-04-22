@@ -26,7 +26,7 @@ export default function OCRScreen() {
   
   // Using the OCR mutation hook
   const ocrMutation = useOcrMutation();
-  const isProcessing = ocrMutation.isPending;
+  const isProcessing = ocrMutation.isLoading;
 
   const handleBack = () => {
     router.back();
@@ -188,7 +188,7 @@ export default function OCRScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0fdf4', // green-50
+    backgroundColor: '#fff', // green-50
   },
   header: {
     flexDirection: 'row',
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    backgroundColor: '#f0fdf4', // green-50
+    backgroundColor: '#fff', // green-50
     borderBottomColor: '#e5e7eb', // gray-200
   },
   headerTitle: {

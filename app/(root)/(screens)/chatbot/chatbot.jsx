@@ -10,8 +10,8 @@ import PropTypes from 'prop-types';
 import { useChatActions } from '../../../../hooks/useChatActions';
 
 const ChatbotScreenContent = ({ chatContext, title }) => {
-  const { messages } = useChat();
-  const { sendMessage } = useChatActions();
+  const { messages, clearMessages } = useChat();
+  const { sendMessage, startNewQuiz } = useChatActions();
   const flatListRef = useRef(null);
 
   // Auto-scroll to bottom when new messages arrive
@@ -20,6 +20,13 @@ const ChatbotScreenContent = ({ chatContext, title }) => {
       flatListRef.current.scrollToEnd({ animated: true });
     }
   }, [messages]);
+
+  const handleNewTopic = async () => {
+    if (chatContext === 'quiz') {
+      await clearMessages();
+      startNewQuiz();
+    }
+  };
 
   const renderMessage = ({ item }) => (
     <ChatBubble 
@@ -34,7 +41,10 @@ const ChatbotScreenContent = ({ chatContext, title }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ChatHeader context={title}  />
+      <ChatHeader 
+        context={title} 
+        onNewTopic={handleNewTopic}
+      />
       <FlatList
         ref={flatListRef}
         data={messages}

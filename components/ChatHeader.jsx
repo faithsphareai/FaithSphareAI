@@ -1,46 +1,57 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import PropTypes from 'prop-types';
 
-export const ChatHeader = ({ context }) => {
-  const navigation = useNavigation();
+export const ChatHeader = ({ context, onNewTopic }) => {
+  const router = useRouter();
+
   return (
     <View style={styles.header}>
-      <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Text style={styles.backButton}>←</Text>
+      <TouchableOpacity onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={24} color="#15803d" />
       </TouchableOpacity>
-      <Text style={styles.title}>{context} </Text>
-      <View style={styles.placeholder} />
+      <Text style={styles.title}>{context}</Text>
+      {context === 'Islamic Quiz' && (
+        <TouchableOpacity onPress={onNewTopic} style={styles.newTopicButton}>
+          <Text style={styles.newTopicText}>New Topic</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
 
+ChatHeader.propTypes = {
+  context: PropTypes.string.isRequired,
+  onNewTopic: PropTypes.func,
+};
+
 const styles = StyleSheet.create({
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      padding: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: '#E5E5EA',
-    },
-    backButtonContainer: {
-      paddingRight: 16,
-      justifyContent: 'center', 
-      alignItems: 'center', 
-    },
-    backButton: {
-      fontSize: 24,
-      lineHeight: 24, 
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      flex: 1,
-      textAlign: 'center',
-    },
-    placeholder: {
-      width: 24, 
-    },
-  
-   
-  });
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5e5',
+    backgroundColor: '#fff',
+  },
+  title: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000',
+    marginLeft: 16,
+  },
+  newTopicButton: {
+    backgroundColor: '#16a34a',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  newTopicText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+});

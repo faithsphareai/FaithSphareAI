@@ -5,17 +5,15 @@ const ChatContext = createContext(null);
 
 export const ChatProvider = ({ children, chatContext }) => {
   const { messages, setMessages } = useChatHistory(chatContext);
+  const clearMessages = async () => {
+    setMessages([]);
+    await saveChatHistory(chatContext, []);
+  };
 
   return (
-    <ChatContext.Provider
-      value={{
-        messages,
-        setMessages,
-        chatContext,
-      }}
-    >
-      {children}
-    </ChatContext.Provider>
+    <ChatContext.Provider value={{ messages, setMessages, chatContext, clearMessages }}>
+    {children}
+  </ChatContext.Provider>
   );
 };
 
