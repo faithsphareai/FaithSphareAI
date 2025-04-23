@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { images } from '../constants';
+import { prayerStyles } from '../styles/prayerStyles';
 
 export default function AsrWomen() {
   const [currentStep, setCurrentStep] = useState(0);
   const fadeAnim = new Animated.Value(1);
-
   const windowWidth = Dimensions.get('window').width;
 
+  // Keep existing asrSteps data
   const asrSteps = [
     {
       title: "Preparation",
@@ -95,6 +96,7 @@ export default function AsrWomen() {
     }
   ];
 
+  // Keep existing handleNext and handlePrevious functions
   const handleNext = () => {
     if (currentStep < asrSteps.length - 1) {
       Animated.sequence([
@@ -132,69 +134,66 @@ export default function AsrWomen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Step Navigation */}
-      <View className="flex-row justify-between items-center px-4 py-2">
+    <View style={prayerStyles.container}>
+      <View style={prayerStyles.navigation}>
         <TouchableOpacity 
           onPress={handlePrevious}
           disabled={currentStep === 0}
-          className={`p-2 ${currentStep === 0 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === 0 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-back" size={24} color="pink" />
+          <Ionicons name="chevron-back" size={24} color="#16a34a" />
         </TouchableOpacity>
         
-        <Text className="text-lg font-semibold text-pink-800">
+        <Text style={prayerStyles.stepText}>
           Step {currentStep + 1} of {asrSteps.length}
         </Text>
         
         <TouchableOpacity 
           onPress={handleNext}
           disabled={currentStep === asrSteps.length - 1}
-          className={`p-2 ${currentStep === asrSteps.length - 1 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === asrSteps.length - 1 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-forward" size={24} color="pink" />
+          <Ionicons name="chevron-forward" size={24} color="#16a34a" />
         </TouchableOpacity>
       </View>
 
-      {/* Step Content */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView style={prayerStyles.scrollView}>
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl font-bold text-pink-800 mb-2">
+          <Text style={prayerStyles.title}>
             {asrSteps[currentStep].title}
           </Text>
           
           <Image 
             source={asrSteps[currentStep].image}
-            style={{ width: windowWidth - 32, height: 200 }}
-            className="rounded-xl mb-4"
+            style={[prayerStyles.image, { width: windowWidth - 32 }]}
             resizeMode="cover"
           />
           
-          <View className="bg-pink-50 rounded-lg p-4 mb-4">
-            <Text className="text-lg text-pink-800">
+          <View style={prayerStyles.descriptionContainer}>
+            <Text style={prayerStyles.descriptionText}>
               {asrSteps[currentStep].description}
             </Text>
           </View>
 
-          <View className="space-y-2 mb-6">
+          <View style={prayerStyles.detailsContainer}>
             {asrSteps[currentStep].details.map((detail, index) => (
-              <View key={index} className="flex-row items-center">
-                <View className="w-2 h-2 rounded-full bg-pink-500 mr-2" />
-                <Text className="text-gray-700 text-base">{detail}</Text>
+              <View key={index} style={prayerStyles.detailRow}>
+                <View style={prayerStyles.bullet} />
+                <Text style={prayerStyles.detailText}>{detail}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* Progress Indicators */}
-      <View className="flex-row justify-center items-center p-4 space-x-2">
+      <View style={prayerStyles.progressContainer}>
         {asrSteps.map((_, index) => (
           <View
             key={index}
-            className={`h-2 w-2 rounded-full ${
-              index === currentStep ? 'bg-pink-500' : 'bg-gray-300'
-            }`}
+            style={[
+              prayerStyles.progressDot,
+              index === currentStep && prayerStyles.activeDot
+            ]}
           />
         ))}
       </View>

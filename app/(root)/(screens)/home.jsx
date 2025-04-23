@@ -29,13 +29,6 @@ export default function HomeScreen() {
       image: require('../../../assets/namazVector.jpg'),
     },
     {
-      title: 'Waqiya',
-      route: { 
-        pathname: '/mood-questionnaire',
-      },
-      image: require('../../../assets/waqiyaVector.jpg'),
-    },
-    {
       title: 'Quiz',
       route: { 
         pathname: '/chatbot',  

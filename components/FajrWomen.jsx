@@ -1,38 +1,36 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { images } from '../constants';
+import { prayerStyles } from '../styles/prayerStyles';
 
 export default function FajrWomen() {
-  const [gender, setGender] = useState('female');
   const [currentStep, setCurrentStep] = useState(0);
   const fadeAnim = new Animated.Value(1);
-
   const windowWidth = Dimensions.get('window').width;
 
   const fajrSteps = [
     {
       title: "Preparation",
-      description: "Prepare for Fajr prayer with proper clothing and intention",
+      description: "Prepare for Fajr prayer with proper covering",
       details: [
         "Ensure proper covering - loose clothes covering entire body except face and hands",
-        "Use prayer mat (if available)",
-        "Ensure quiet, clean place for prayer",
+        "Make sure prayer area is clean",
         "Face the Qibla direction",
-        "Check that prayer time has begun",
-        "Make wudu if not already done"
+        "Make wudu if not already done",
+        "Keep movements gentle and controlled",
+        "Ensure it's after dawn but before sunrise"
       ],
-      image: images.preparation
+      image: images.niyyah
     },
     {
       title: "Sunnah First Rakat",
-      description: "Begin with 2 Sunnah rakats before Farz",
+      description: "Begin with 2 Sunnah rakats",
       details: [
-        "Make Niyyah for 2 Sunnah rakats",
-        "Raise hands to shoulders (not above) saying Takbir",
-        "Place right hand over left below chest",
-        "Keep feet close together",
+        "Make Niyyah for Sunnah prayer",
+        "Say Takbir keeping hands below shoulders",
+        "Place hands on chest, right over left",
+        "Keep feet together and body compact",
         "Recite Thana quietly",
         "Recite Ta'awwuz and Tasmiah",
         "Recite Surah Al-Fatiha",
@@ -41,85 +39,59 @@ export default function FajrWomen() {
       image: images.qiyam
     },
     {
-      title: "Sunnah Ruku and Sujood",
+      title: "Ruku and Sujood",
       description: "Complete first Sunnah rakat",
       details: [
-        "For Ruku, bend with back straight but not too low",
+        "Bend for Ruku keeping body compact",
         "Keep arms close to sides",
-        "Place hands on knees with fingers together",
         "Say 'Subhana Rabbiyal Azeem' 3 times",
         "Rise saying 'Sami Allahu Liman Hamidah'",
-        "For Sujood, go down keeping body close together",
-        "Place forehead, nose, palms, knees, and toes on ground",
-        "Keep arms close to sides and flat on ground",
-        "Say 'Subhana Rabbiyal Ala' 3 times"
+        "For Sujood, go down keeping body compact",
+        "Keep arms close to body in Sujood",
+        "Maintain modest positioning"
       ],
-      image: images.ruku_women
+      image: images.ruku
     },
     {
-      title: "Sunnah Second Rakat",
+      title: "Second Sunnah Rakat",
       description: "Complete Sunnah prayer",
       details: [
-        "Stand for second Rakat",
-        "Recite Bismillah",
-        "Recite Surah Al-Fatiha",
-        "Recite another Surah",
-        "Complete Ruku and Sujood as before",
-        "Sit for final Qaida",
-        "Keep right foot upright, left foot resting",
-        "Place hands on thighs with fingers together",
-        "Recite At-Tahiyyat, Durood Ibrahim, and duas",
-        "Complete with Salam to both sides"
+        "Stand gracefully for second Rakat",
+        "Recite Al-Fatiha and another Surah",
+        "Complete Ruku and Sujood modestly",
+        "Sit for final Tashahhud",
+        "Keep feet to right side while sitting",
+        "Recite At-Tahiyyat",
+        "Complete with Salam"
       ],
-      image: images.tashahhud_women
+      image: images.tashahhud
     },
     {
       title: "Farz First Rakat",
-      description: "Begin 2 Farz rakats of Fajr prayer",
+      description: "Begin 2 Farz rakats",
       details: [
-        "Make Niyyah for Fajr Farz prayer",
-        "Raise hands to shoulders saying Takbir",
-        "Position hands and feet as in Sunnah",
-        "Recite Thana",
-        "Recite Ta'awwuz and Tasmiah",
-        "Recite Surah Al-Fatiha",
-        "Recite another Surah",
-        "Complete Ruku and Sujood as before"
+        "Make new Niyyah for Farz",
+        "Keep movements controlled",
+        "Maintain proper covering",
+        "Recite Al-Fatiha and another Surah",
+        "Complete Ruku and Sujood",
+        "Keep posture modest throughout"
       ],
-      image: images.qiyam
+      image: images.takbeer
     },
     {
-      title: "Farz Second Rakat",
-      description: "Complete the Farz prayer",
+      title: "Farz Completion",
+      description: "Complete Fajr Farz prayer",
       details: [
         "Stand for second Rakat",
-        "Recite Surah Al-Fatiha",
-        "Recite another Surah",
-        "Complete Ruku and Sujood",
-        "Sit for final Qaida",
-        "Maintain compact sitting position",
-        "Recite At-Tahiyyat",
-        "Recite Durood Ibrahim",
-        "Recite closing duas",
-        "Complete with Salam to both sides"
+        "Recite required Surahs",
+        "Complete positions modestly",
+        "Sit for final Tashahhud",
+        "Recite Durood and duas",
+        "Complete with Salam",
+        "Make personal duas"
       ],
-      image: images.tashahhud_women
-    },
-    {
-      title: "Post-Prayer Duas",
-      description: "Complete prayer with recommended duas",
-      details: [
-        "Remain seated in prayer position",
-        "Recite Astaghfirullah 3 times",
-        "Recite Ayat-ul-Kursi",
-        "Perform Tasbih-e-Fatima:",
-        "- SubhanAllah 33 times",
-        "- Alhamdulillah 33 times",
-        "- Allahu Akbar 34 times",
-        "Make personal duas",
-        "Recite morning (Fajr) specific duas"
-      ],
-      image: images.dua
+      image: images.tasleem
     }
   ];
 
@@ -160,71 +132,66 @@ export default function FajrWomen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header with Gender Selection */}
-     
-      {/* Step Navigation */}
-      <View className="flex-row justify-between items-center px-4 py-2">
+    <View style={prayerStyles.container}>
+      <View style={prayerStyles.navigation}>
         <TouchableOpacity 
           onPress={handlePrevious}
           disabled={currentStep === 0}
-          className={`p-2 ${currentStep === 0 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === 0 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-back" size={24} color="purple" />
+          <Ionicons name="chevron-back" size={24} color="#16a34a" />
         </TouchableOpacity>
         
-        <Text className="text-lg font-semibold text-purple-800">
+        <Text style={prayerStyles.stepText}>
           Step {currentStep + 1} of {fajrSteps.length}
         </Text>
         
         <TouchableOpacity 
           onPress={handleNext}
           disabled={currentStep === fajrSteps.length - 1}
-          className={`p-2 ${currentStep === fajrSteps.length - 1 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === fajrSteps.length - 1 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-forward" size={24} color="purple" />
+          <Ionicons name="chevron-forward" size={24} color="#16a34a" />
         </TouchableOpacity>
       </View>
 
-      {/* Step Content */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView style={prayerStyles.scrollView}>
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl font-bold text-purple-800 mb-2">
+          <Text style={prayerStyles.title}>
             {fajrSteps[currentStep].title}
           </Text>
           
           <Image 
             source={fajrSteps[currentStep].image}
-            style={{ width: windowWidth - 32, height: 200 }}
-            className="rounded-xl mb-4"
+            style={[prayerStyles.image, { width: windowWidth - 32 }]}
             resizeMode="cover"
           />
           
-          <View className="bg-purple-50 rounded-lg p-4 mb-4">
-            <Text className="text-lg text-purple-800">
+          <View style={prayerStyles.descriptionContainer}>
+            <Text style={prayerStyles.descriptionText}>
               {fajrSteps[currentStep].description}
             </Text>
           </View>
 
-          <View className="space-y-2 mb-6">
+          <View style={prayerStyles.detailsContainer}>
             {fajrSteps[currentStep].details.map((detail, index) => (
-              <View key={index} className="flex-row items-center">
-                <View className="w-2 h-2 rounded-full bg-purple-500 mr-2" />
-                <Text className="text-gray-700 text-base">{detail}</Text>
+              <View key={index} style={prayerStyles.detailRow}>
+                <View style={prayerStyles.bullet} />
+                <Text style={prayerStyles.detailText}>{detail}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* Progress Indicators */}
-      <View className="flex-row justify-center items-center p-4 space-x-2">
+      <View style={prayerStyles.progressContainer}>
         {fajrSteps.map((_, index) => (
           <View
             key={index}
-            className={`h-2 w-2 rounded-full ${
-              index === currentStep ? 'bg-purple-500' : 'bg-gray-300'
-            }`}
+            style={[
+              prayerStyles.progressDot,
+              index === currentStep && prayerStyles.activeDot
+            ]}
           />
         ))}
       </View>

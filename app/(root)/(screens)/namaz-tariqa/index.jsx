@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Animated, Image } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Animated, Image, StyleSheet } from 'react-native';
 import { useRouter, useNavigation } from 'expo-router';
 import { Fajr, Dhuhr, Asr, Maghrib, Isha } from '../../../../constants/icons';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,44 +30,44 @@ export default function PrayerScreen() {
     { title: 'Isha', icon: Isha },
   ];
 
-  
-
   return (
-    <SafeAreaView className="flex-1 bg-green-50">
-      <View className="flex-row items-center px-4  py-4 border-b bg-green-50 border-gray-200">
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-        <Ionicons name="arrow-back" size={24} color="#15803d" />
+          <Ionicons name="arrow-back" size={24} color="#15803d" />
         </TouchableOpacity>
-        <Text className="flex-1 text-lg text-green-800 font-semibold text-center">
+        <Text style={styles.headerTitle}>
           Prayer Guide
         </Text>
-        <View className="w-6" />
+        <View style={styles.headerSpace} />
       </View>
 
-      <ScrollView className="p-4 bg-white ">
-        <View className="flex-row flex-wrap justify-between">
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.gridContainer}>
           {prayers.map((prayer) => (
             <Animated.View
               key={prayer.title}
-              style={{
-                opacity: fadeAnim,
-                transform: [
-                  {
-                    translateY: fadeAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [50, 0],
-                    }),
-                  },
-                ],
-              }}
-              className="w-[45%] mb-4"
+              style={[
+                styles.gridItem,
+                {
+                  opacity: fadeAnim,
+                  transform: [
+                    {
+                      translateY: fadeAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [50, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
             >
               <TouchableOpacity
                 onPress={() => router.push(`/namaz-tariqa/${prayer.title}`)}
-                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 items-center p-4"
+                style={styles.prayerCard}
               >
-                <Image source={prayer.icon} className="w-12 h-12 mb-2" />
-                <Text className="text-base font-medium  text-center">
+                <Image source={prayer.icon} style={styles.prayerIcon} />
+                <Text style={styles.prayerTitle}>
                   {prayer.title}
                 </Text>
               </TouchableOpacity>
@@ -78,3 +78,69 @@ export default function PrayerScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f0fdf4', // bg-green-50
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb', // border-gray-200
+    backgroundColor: '#f0fdf4', // bg-green-50
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    color: '#15803d', // text-green-800
+  },
+  headerSpace: {
+    width: 24,
+  },
+  scrollView: {
+    padding: 16,
+    backgroundColor: '#ffffff',
+  },
+  gridContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridItem: {
+    width: '45%',
+    marginBottom: 16,
+  },
+  prayerCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e5e7eb', // border-gray-200
+    alignItems: 'center',
+    padding: 16,
+  },
+  prayerIcon: {
+    width: 48,
+    height: 48,
+    marginBottom: 8,
+  },
+  prayerTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+});

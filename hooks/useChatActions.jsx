@@ -2,10 +2,13 @@ import { useChat } from '../context/ChatContext';
 import { formatMessage } from '../utils/messageFormat';
 import { saveChatHistory } from '../utils/chatStorage';
 import { useAyatFinderMutation } from './useAyatFinderMutation';
+import { useHadithFinderMutation } from './useHadithFinderMutation';
 import { useQuizMutations } from './useQuizMutations';
 
 export const useChatActions = () => {
   const { messages, setMessages, chatContext } = useChat();
+  const ayatFinderMutation = useAyatFinderMutation();
+  const hadithFinderMutation = useHadithFinderMutation();
   const { generateQuizMutation, gradeQuizMutation } = useQuizMutations();
 
   const startNewQuiz = async () => {
@@ -71,10 +74,19 @@ export const useChatActions = () => {
       } else if (chatContext === 'quran') {
         // Use Ayat Finder for Quran authentication
         response = await ayatFinderMutation.mutateAsync(text);
+      } else if (chatContext === 'hadith') {
+        // Use Hadith Finder for Hadith authentication
+        response = await hadithFinderMutation.mutateAsync(text);
+      } else {
+        throw new Error(`Unsupported chat context: ${chatContext}`);
       }
 
       clearInterval(typingInterval);
       
+      if (!response) {
+        throw new Error('No response received from the API');
+      }
+
       const botMessage = formatMessage(response, 'bot', {
         isQuestion: chatContext === 'quiz'
       });
@@ -87,10 +99,11 @@ export const useChatActions = () => {
 
       await saveChatHistory(chatContext, [...messages, userMessage, botMessage]);
     } catch (error) {
+      console.error('Chat action error:', error);
       clearInterval(typingInterval);
       
       const errorMessage = formatMessage(
-        'Sorry, I encountered an error. Please try again.',
+        `Sorry, I encountered an error: ${error.message}. Please try again.`,
         'bot'
       );
       setMessages(prevMessages => 

@@ -193,3 +193,36 @@ const handleApiError = (error, service) => {
     return new Error(`${service} request failed: ${error.message}`);
   }
 };
+
+// Add new constant for Hadith Finder API
+const HADITH_FINDER_URL = 'https://hammad712-hadith-finder.hf.space/query';
+
+/**
+ * Sends a question to the Hadith Finder API and returns the answer
+ * @param {string} question - The hadith query
+ * @returns {Promise<string>} The answer from the API
+ */
+export const getHadithAnswer = async (question) => {
+  try {
+    const response = await axios.post(
+      HADITH_FINDER_URL,
+      { question },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    
+    if (!response.data || !response.data.answer) {
+      throw new Error('Invalid response format from Hadith Finder API');
+    }
+    
+    return response.data.answer;
+  } catch (error) {
+    console.error('Hadith Finder API Error:', error);
+    throw handleApiError(error, 'Hadith Finder');
+  }
+};

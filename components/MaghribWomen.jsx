@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { images } from '../constants';
+import { prayerStyles } from '../styles/prayerStyles';
 
 export default function MaghribWomen() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -10,78 +11,72 @@ export default function MaghribWomen() {
 
   const maghribSteps = [
     {
-      title: "Farz First Rakat",
-      description: "Begin with 3 Farz rakats of Maghrib prayer",
+      title: "Preparation",
+      description: "Prepare for Maghrib prayer with proper covering",
       details: [
-        "Make Niyyah for Maghrib Farz prayer",
-        "Raise hands to shoulders (not above) saying Takbir",
-        "Place hands on chest, right over left",
-        "Keep feet close together, maintaining modest posture",
-        "Recite Thana quietly",
-        "Recite Ta'awwuz and Tasmiah",
-        "Recite Surah Al-Fatiha",
-        "Recite another Surah",
-        "Perform Ruku keeping arms close to sides",
-        "Keep movements controlled and gentle"
+        "Ensure proper covering - loose clothes covering entire body except face and hands",
+        "Make sure prayer area is clean",
+        "Face the Qibla direction",
+        "Make wudu if not already done",
+        "Keep movements gentle and controlled",
+        "Begin after sunset"
       ],
       image: images.niyyah
     },
     {
-      title: "Farz Second Rakat",
-      description: "Complete second Farz rakat",
+      title: "Initial Sunnah",
+      description: "Begin with 2 Sunnah rakats",
       details: [
-        "Rise gently for second Rakat",
-        "Maintain proper covering throughout",
-        "Recite Surah Al-Fatiha",
-        "Recite another Surah",
-        "Perform Ruku and Sujood with compact positioning",
-        "In Sujood, keep arms close to body",
-        "Sit for Qaida-e-Oola (first sitting)",
-        "Recite At-Tahiyyat",
-        "Rise carefully for third Rakat"
+        "Make Niyyah for Sunnah prayer",
+        "Keep hands below shoulders for Takbir",
+        "Place hands on chest, right over left",
+        "Keep feet together and body compact",
+        "Recite Thana quietly",
+        "Recite Ta'awwuz and Tasmiah",
+        "Recite Surah Al-Fatiha and another Surah",
+        "Complete positions modestly"
+      ],
+      image: images.qiyam
+    },
+    {
+      title: "Farz Prayer",
+      description: "Perform 3 Farz rakats",
+      details: [
+        "Make new Niyyah for Farz",
+        "Maintain modest positioning",
+        "Keep movements controlled",
+        "Recite required Surahs",
+        "In Ruku, bend only as needed",
+        "Keep arms close to body in Sujood",
+        "Complete all positions with composure"
       ],
       image: images.ruku
     },
     {
-      title: "Farz Third Rakat",
-      description: "Complete the Farz prayer",
+      title: "Additional Sunnah",
+      description: "Complete 2 Sunnah rakats",
       details: [
-        "Stand with composed posture",
-        "Recite only Surah Al-Fatiha",
-        "Keep movements gentle and controlled",
-        "Complete Ruku and Sujood maintaining modesty",
-        "Sit for final Qaida keeping feet to right side",
-        "Recite At-Tahiyyat",
-        "Recite Durood Ibrahim",
-        "Complete with gentle Salam to both sides"
+        "Make Niyyah for 2 Sunnah",
+        "Keep movements gentle",
+        "Maintain proper covering",
+        "Complete positions modestly",
+        "Recite required Surahs",
+        "End with Tashahhud and Salam",
+        "Keep composure throughout"
       ],
       image: images.sajda
-    },
-    {
-      title: "Sunnah Rakats",
-      description: "Perform 2 Sunnah rakats after Farz",
-      details: [
-        "Make Niyyah for 2 Sunnah rakats",
-        "Maintain modest positioning throughout",
-        "Keep movements gentle and controlled",
-        "Recite Al-Fatiha and another Surah in each rakat",
-        "Perform Ruku and Sujood with compact form",
-        "Complete with Tashahhud and Salam",
-        "Maintain composure throughout"
-      ],
-      image: images.qiyam
     },
     {
       title: "Nafl Prayer",
       description: "Optional 2 Nafl rakats",
       details: [
-        "Make Niyyah for 2 Nafl rakats",
-        "Can be performed at home",
-        "Follow same procedure as Sunnah",
-        "Maintain gentle, controlled movements",
-        "Keep body compact in all positions",
-        "Complete with Tashahhud and Salam",
-        "Make personal duas while maintaining composure"
+        "Make Niyyah for Nafl",
+        "Keep movements controlled",
+        "Maintain modest posture",
+        "Recite preferred Surahs",
+        "Complete positions gently",
+        "End with Tashahhud and Salam",
+        "Make personal duas"
       ],
       image: images.tashahhud
     }
@@ -124,69 +119,66 @@ export default function MaghribWomen() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Step Navigation */}
-      <View className="flex-row justify-between items-center px-4 py-2">
+    <View style={prayerStyles.container}>
+      <View style={prayerStyles.navigation}>
         <TouchableOpacity 
           onPress={handlePrevious}
           disabled={currentStep === 0}
-          className={`p-2 ${currentStep === 0 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === 0 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-back" size={24} color="green" />
+          <Ionicons name="chevron-back" size={24} color="#16a34a" />
         </TouchableOpacity>
         
-        <Text className="text-lg font-semibold text-green-800">
+        <Text style={prayerStyles.stepText}>
           Step {currentStep + 1} of {maghribSteps.length}
         </Text>
         
         <TouchableOpacity 
           onPress={handleNext}
           disabled={currentStep === maghribSteps.length - 1}
-          className={`p-2 ${currentStep === maghribSteps.length - 1 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === maghribSteps.length - 1 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-forward" size={24} color="green" />
+          <Ionicons name="chevron-forward" size={24} color="#16a34a" />
         </TouchableOpacity>
       </View>
 
-      {/* Step Content */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView style={prayerStyles.scrollView}>
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl font-bold text-green-800 mb-2">
+          <Text style={prayerStyles.title}>
             {maghribSteps[currentStep].title}
           </Text>
           
           <Image 
             source={maghribSteps[currentStep].image}
-            style={{ width: windowWidth - 32, height: 200 }}
-            className="rounded-xl mb-4"
+            style={[prayerStyles.image, { width: windowWidth - 32 }]}
             resizeMode="cover"
           />
           
-          <View className="bg-green-50 rounded-lg p-4 mb-4">
-            <Text className="text-lg text-green-800">
+          <View style={prayerStyles.descriptionContainer}>
+            <Text style={prayerStyles.descriptionText}>
               {maghribSteps[currentStep].description}
             </Text>
           </View>
 
-          <View className="space-y-2 mb-6">
+          <View style={prayerStyles.detailsContainer}>
             {maghribSteps[currentStep].details.map((detail, index) => (
-              <View key={index} className="flex-row items-center">
-                <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-gray-700 text-base">{detail}</Text>
+              <View key={index} style={prayerStyles.detailRow}>
+                <View style={prayerStyles.bullet} />
+                <Text style={prayerStyles.detailText}>{detail}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* Progress Indicators */}
-      <View className="flex-row justify-center items-center p-4 space-x-2">
+      <View style={prayerStyles.progressContainer}>
         {maghribSteps.map((_, index) => (
           <View
             key={index}
-            className={`h-2 w-2 rounded-full ${
-              index === currentStep ? 'bg-green-500' : 'bg-gray-300'
-            }`}
+            style={[
+              prayerStyles.progressDot,
+              index === currentStep && prayerStyles.activeDot
+            ]}
           />
         ))}
       </View>

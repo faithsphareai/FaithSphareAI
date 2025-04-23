@@ -11,6 +11,9 @@ export const ChatBubble = ({ message, isUser }) => {
       : '';
   };
 
+  // Add safety check for message text
+  const messageText = message?.text || 'Message unavailable';
+
   return (
     <View style={[
       styles.bubbleContainer,
@@ -24,22 +27,23 @@ export const ChatBubble = ({ message, isUser }) => {
           styles.messageText,
           isUser ? styles.userMessageText : styles.botMessageText
         ]}>
-          {message.text}
+          {messageText}
         </Text>
         <Text style={[
           styles.timestamp,
           isUser ? styles.userTimestamp : styles.botTimestamp
         ]}>
-          {formatTime(message.timestamp)}
+          {formatTime(message?.timestamp)}
         </Text>
       </View>
     </View>
   );
 };
 
+// Update PropTypes to make text optional with a default value
 ChatBubble.propTypes = {
   message: PropTypes.shape({
-    text: PropTypes.string.isRequired,
+    text: PropTypes.string,
     timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }).isRequired,
   isUser: PropTypes.bool.isRequired,

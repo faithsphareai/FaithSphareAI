@@ -1,57 +1,42 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { images } from '../constants';
+import { prayerStyles } from '../styles/prayerStyles';
 
-export default function Dhuhr() {
-  const [gender, setGender] = useState('male');
+export default function Zuhr() {
   const [currentStep, setCurrentStep] = useState(0);
   const fadeAnim = new Animated.Value(1);
-
   const windowWidth = Dimensions.get('window').width;
 
-  const dhuhrSteps = [
+  const zuhrSteps = [
     {
-      title: "Sunnah First Two Rakats",
-      description: "Begin with 4 Sunnah rakats (prayed in sets of 2)",
+      title: "Initial Sunnah",
+      description: "Begin with 4 Sunnah rakats of Zuhr",
       details: [
-        "Make Niyyah for first 2 Sunnah rakats",
-        "Say Takbir-e-Tahreema (Allahu Akbar)",
+        "Make Niyyah for 4 Sunnah rakats",
+        "Say Takbir-e-Tahreema",
         "Recite Thana",
         "Recite Ta'awwuz and Tasmiah",
         "Recite Surah Al-Fatiha",
         "Recite another Surah",
         "Complete Ruku and Sujood",
-        "Second rakat similar to first",
-        "End with Tashahhud and Salam"
+        "After 2 rakats, complete with Tashahhud",
+        "Stand for remaining 2 rakats"
       ],
       image: images.niyyah
     },
     {
-      title: "Sunnah Second Two Rakats",
-      description: "Complete the remaining 2 Sunnah rakats",
-      details: [
-        "Stand and make Niyyah for next 2 rakats",
-        "Repeat process as before",
-        "Recite Al-Fatiha and another Surah in both rakats",
-        "Complete all positions as before",
-        "End with Tashahhud and Salam"
-      ],
-      image: images.qiyam
-    },
-    {
       title: "Farz First Rakat",
-      description: "Begin 4 Farz rakats of Dhuhr",
+      description: "Begin 4 Farz rakats of Zuhr",
       details: [
-        "Make new Niyyah for 4 Farz rakats",
+        "Make new Niyyah for Zuhr Farz",
         "Say Takbir-e-Tahreema",
-        "Recite Thana, Ta'awwuz, Tasmiah",
+        "Recite Thana",
+        "Recite Ta'awwuz and Tasmiah",
         "Recite Surah Al-Fatiha",
         "Recite another Surah",
-        "Complete Ruku saying 'Subhana Rabbiyal Azeem'",
-        "Rise saying 'Sami Allahu Liman Hamidah'",
-        "Perform two Sujood"
+        "Complete Ruku and Sujood"
       ],
       image: images.takbeer
     },
@@ -60,56 +45,63 @@ export default function Dhuhr() {
       description: "Complete second Farz rakat",
       details: [
         "Stand for second Rakat",
-        "Recite Al-Fatiha and another Surah",
+        "Recite Bismillah",
+        "Recite Surah Al-Fatiha",
+        "Recite another Surah",
         "Complete Ruku and Sujood",
-        "Sit for Qaida-e-Oola (first sitting)",
-        "Recite only At-Tahiyyat",
+        "Sit for Qaida-e-Oola",
+        "Recite At-Tahiyyat",
         "Stand for third Rakat"
       ],
       image: images.ruku
     },
     {
-      title: "Farz Third Rakat",
-      description: "Continue with third Farz rakat",
+      title: "Farz Third and Fourth Rakat",
+      description: "Complete remaining Farz rakats",
       details: [
-        "Stand up for third Rakat",
+        "In third and fourth rakats:",
         "Recite only Surah Al-Fatiha",
-        "No additional Surah needed",
         "Complete Ruku and Sujood",
-        "Stand for fourth Rakat"
+        "In final sitting recite:",
+        "At-Tahiyyat",
+        "Durood Ibrahim",
+        "Closing duas",
+        "Complete with Salam"
       ],
       image: images.sajda
     },
     {
-      title: "Farz Fourth Rakat",
-      description: "Complete the Farz prayer",
+      title: "Additional Sunnah",
+      description: "Complete 2 Sunnah rakats",
       details: [
-        "Recite only Surah Al-Fatiha",
-        "Complete Ruku and Sujood",
-        "Sit for final Qaida (Qaida-e-Akhira)",
-        "Recite At-Tahiyyat",
-        "Recite Durood Ibrahim",
-        "Recite closing duas",
-        "Complete with Salam to both sides"
+        "Make Niyyah for 2 Sunnah",
+        "Complete 2 rakats with:",
+        "Surah Al-Fatiha",
+        "Another Surah in each rakat",
+        "Ruku and Sujood",
+        "Final sitting with At-Tahiyyat",
+        "Complete with Salam"
       ],
       image: images.tashahhud
     },
     {
-      title: "Final Sunnah",
-      description: "Complete 2 final Sunnah rakats",
+      title: "Nafl Prayer",
+      description: "Optional 2 Nafl rakats",
       details: [
-        "Make Niyyah for 2 final Sunnah rakats",
-        "Perform 2 rakats as before",
-        "Recite Al-Fatiha and another Surah in both",
-        "Complete with Tashahhud and Salam",
-        "Make any personal duas"
+        "Make Niyyah for Nafl",
+        "Complete 2 rakats as normal",
+        "Recite preferred Surahs",
+        "Maintain focus and concentration",
+        "Complete with Tashahhud",
+        "End with Salam",
+        "Make personal duas"
       ],
       image: images.tasleem
     }
   ];
 
   const handleNext = () => {
-    if (currentStep < dhuhrSteps.length - 1) {
+    if (currentStep < zuhrSteps.length - 1) {
       Animated.sequence([
         Animated.timing(fadeAnim, {
           toValue: 0,
@@ -145,72 +137,66 @@ export default function Dhuhr() {
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header with Gender Selection */}
-    
-
-      {/* Step Navigation */}
-      <View className="flex-row justify-between items-center px-4 py-2">
+    <View style={prayerStyles.container}>
+      <View style={prayerStyles.navigation}>
         <TouchableOpacity 
           onPress={handlePrevious}
           disabled={currentStep === 0}
-          className={`p-2 ${currentStep === 0 ? 'opacity-50' : ''}`}
+          style={[prayerStyles.navButton, currentStep === 0 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-back" size={24} color="green" />
+          <Ionicons name="chevron-back" size={24} color="#16a34a" />
         </TouchableOpacity>
         
-        <Text className="text-lg font-semibold text-green-800">
-          Step {currentStep + 1} of {dhuhrSteps.length}
+        <Text style={prayerStyles.stepText}>
+          Step {currentStep + 1} of {zuhrSteps.length}
         </Text>
         
         <TouchableOpacity 
           onPress={handleNext}
-          disabled={currentStep === dhuhrSteps.length - 1}
-          className={`p-2 ${currentStep === dhuhrSteps.length - 1 ? 'opacity-50' : ''}`}
+          disabled={currentStep === zuhrSteps.length - 1}
+          style={[prayerStyles.navButton, currentStep === zuhrSteps.length - 1 && prayerStyles.disabledButton]}
         >
-          <Ionicons name="chevron-forward" size={24} color="green" />
+          <Ionicons name="chevron-forward" size={24} color="#16a34a" />
         </TouchableOpacity>
       </View>
 
-      {/* Step Content */}
-      <ScrollView className="flex-1 px-4">
+      <ScrollView style={prayerStyles.scrollView}>
         <Animated.View style={{ opacity: fadeAnim }}>
-          <Text className="text-xl font-bold text-green-800 mb-2">
-            {dhuhrSteps[currentStep].title}
+          <Text style={prayerStyles.title}>
+            {zuhrSteps[currentStep].title}
           </Text>
           
           <Image 
-            source={dhuhrSteps[currentStep].image}
-            style={{ width: windowWidth - 32, height: 200 }}
-            className="rounded-xl mb-4"
+            source={zuhrSteps[currentStep].image}
+            style={[prayerStyles.image, { width: windowWidth - 32 }]}
             resizeMode="cover"
           />
           
-          <View className="bg-green-50 rounded-lg p-4 mb-4">
-            <Text className="text-lg text-green-800">
-              {dhuhrSteps[currentStep].description}
+          <View style={prayerStyles.descriptionContainer}>
+            <Text style={prayerStyles.descriptionText}>
+              {zuhrSteps[currentStep].description}
             </Text>
           </View>
 
-          <View className="space-y-2 mb-6">
-            {dhuhrSteps[currentStep].details.map((detail, index) => (
-              <View key={index} className="flex-row items-center">
-                <View className="w-2 h-2 rounded-full bg-green-500 mr-2" />
-                <Text className="text-gray-700 text-base">{detail}</Text>
+          <View style={prayerStyles.detailsContainer}>
+            {zuhrSteps[currentStep].details.map((detail, index) => (
+              <View key={index} style={prayerStyles.detailRow}>
+                <View style={prayerStyles.bullet} />
+                <Text style={prayerStyles.detailText}>{detail}</Text>
               </View>
             ))}
           </View>
         </Animated.View>
       </ScrollView>
 
-      {/* Progress Indicators */}
-      <View className="flex-row justify-center items-center p-4 space-x-2">
-        {dhuhrSteps.map((_, index) => (
+      <View style={prayerStyles.progressContainer}>
+        {zuhrSteps.map((_, index) => (
           <View
             key={index}
-            className={`h-2 w-2 rounded-full ${
-              index === currentStep ? 'bg-green-500' : 'bg-gray-300'
-            }`}
+            style={[
+              prayerStyles.progressDot,
+              index === currentStep && prayerStyles.activeDot
+            ]}
           />
         ))}
       </View>

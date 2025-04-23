@@ -8,7 +8,8 @@ import {
   ActivityIndicator,
   Alert,
   TextInput,
-  StyleSheet
+  StyleSheet,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -17,6 +18,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import { Ionicons, MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Animatable from 'react-native-animatable';
 import { useOcrMutation } from '../../../hooks/useOcrMutation';
+import { Clipboard, } from 'react-native';
 
 export default function OCRScreen() {
   const router = useRouter();
@@ -89,6 +91,10 @@ export default function OCRScreen() {
         error.message || 'Failed to process file. Please try again.'
       );
     }
+  };
+
+  const copyToClipboard = () => {
+    Clipboard.setString(recognizedText);
   };
 
   return (
@@ -169,16 +175,39 @@ export default function OCRScreen() {
 
         {/* Recognized Text (Disabled TextArea) */}
         <View style={styles.textResultContainer}>
-          <Text style={styles.textResultTitle}>Extracted Text:</Text>
-          <TextInput
-            multiline
-            numberOfLines={8}
-            value={recognizedText}
-            editable={false}
-            style={styles.textResultInput}
-            placeholder="Extracted text will appear here"
-            placeholderTextColor="#9ca3af"
-          />
+          <View style={styles.textResultHeader}>
+            <Text style={styles.textResultTitle}>Extracted Text:</Text>
+            <TouchableOpacity 
+              onPress={copyToClipboard}
+              disabled={!recognizedText}
+              style={[
+                styles.copyButton,
+                !recognizedText && styles.disabledCopyButton
+              ]}
+            >
+              <MaterialIcons 
+                name="content-copy" 
+                size={20} 
+                color={recognizedText ? "#15803d" : "#9ca3af"} 
+              />
+              <Text style={[
+                styles.copyButtonText,
+                !recognizedText && styles.disabledCopyButtonText
+              ]}>
+                Copy
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView 
+            style={styles.textResultScrollView}
+            nestedScrollEnabled={true}
+          >
+            <Text
+              style={styles.textResultInput}
+            >
+              {recognizedText || "Extracted text will appear here"}
+            </Text>
+          </ScrollView>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -298,20 +327,47 @@ const styles = StyleSheet.create({
   },
   textResultContainer: {
     marginBottom: 16,
+    flex: 1,
   },
-  textResultTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1f2937', // gray-800
+  textResultHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  textResultInput: {
-    backgroundColor: '#f3f4f6', // gray-100
-    padding: 12,
+  copyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#f0fdf4',
+  },
+  disabledCopyButton: {
+    backgroundColor: '#f3f4f6',
+  },
+  copyButtonText: {
+    marginLeft: 4,
+    color: '#15803d',
+    fontWeight: '500',
+  },
+  disabledCopyButtonText: {
+    color: '#9ca3af',
+  },
+  textResultScrollView: {
+    maxHeight: 160,
+    backgroundColor: '#f3f4f6',
     borderRadius: 8,
-    color: '#374151', // gray-700
     borderWidth: 1,
-    borderColor: '#e5e7eb', // gray-200
-    height: 160, // roughly 8 lines
+    borderColor: '#e5e7eb',
+  },
+  textResultInput: {
+    padding: 12,
+    color: '#374151',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  textResultInput: {
+    padding: 12,
+    color: '#374151',
+    textAlignVertical: 'top',
   },
 });

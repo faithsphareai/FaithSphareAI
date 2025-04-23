@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useLocalSearchParams } from 'expo-router';
 
@@ -32,22 +32,21 @@ export default function PrayerScreen() {
       case 'Isha':
         return gender === 'male' ? <Isha /> : <IshaWomen />;
       default:
-        return <Text className="text-center text-lg mt-20">Prayer not found.</Text>;
+        return <Text style={styles.notFoundText}>Prayer not found.</Text>;
     }
   };
 
   return (
-    <View className="flex-1 bg-white">
-      {/* Header with Gender Selection */}
-      <View className="bg-green-50 pt-12 pb-4 px-4">
-        <Text className="text-xl font-bold  text-green-800 text-center mb-4">
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>
           {prayer} Prayer Guide
         </Text>
-        <View className="bg-white rounded-lg overflow-hidden">
+        <View style={styles.pickerContainer}>
           <Picker
             selectedValue={gender}
             onValueChange={(itemValue) => setGender(itemValue)}
-            className="h-12"
+            style={styles.picker}
           >
             <Picker.Item label="Male Prayer Guide" value="male" />
             <Picker.Item label="Female Prayer Guide" value="female" />
@@ -55,8 +54,40 @@ export default function PrayerScreen() {
         </View>
       </View>
 
-      {/* Prayer Component */}
       {renderPrayerComponent()}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  header: {
+    backgroundColor: '#f0fdf4',
+    paddingTop: 48,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#15803d',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  pickerContainer: {
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  picker: {
+    height: 48,
+  },
+  notFoundText: {
+    textAlign: 'center',
+    fontSize: 18,
+    marginTop: 80,
+  },
+});
