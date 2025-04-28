@@ -14,12 +14,12 @@ import { useRouter } from 'expo-router';
 import { images } from '../../constants'; 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useDatabase } from '../../utils/services/database';
+// Replace database import with authService
+import authService from '../../utils/services/authService';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login, user, isAuthenticated } = useAuth();
-  const { authenticateUser } = useDatabase();
+  const { login, isAuthenticated } = useAuth();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,18 +42,18 @@ export default function LoginScreen() {
       
       setLoading(true);
       
-      // Use the database service to authenticate
-      const result = await authenticateUser(email, password);
+      // Use the API service to authenticate
+      const userData = await authService.login(email, password);
       
       setLoading(false);
       
-      if (!result.success) {
-        Alert.alert('Error', result.message);
+      if (!userData) {
+        Alert.alert('Error', 'Invalid email or password');
         return;
       }
       
       // Store user in AuthContext
-      await login(result.user);
+      await login(userData);
       
       // Reset form
       setEmail('');
@@ -64,7 +64,16 @@ export default function LoginScreen() {
       
     } catch (error) {
       setLoading(false);
-      Alert.alert('Error', 'Failed to login. Please try again.');
+      
+      let errorMessage = 'Failed to login. Please try again.';
+      
+      if (error.response && error.response.data && error.response.data.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -136,7 +145,8 @@ export default function LoginScreen() {
             borderRadius: 8,
             alignItems: 'center',
             marginTop: 32,
-            marginBottom: 48
+            marginBottom: 48,
+            opacity: loading ? 0.7 : 1
           }}
         >
           {loading ? (

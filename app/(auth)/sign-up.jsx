@@ -14,18 +14,17 @@ import { useRouter } from 'expo-router';
 import { images } from '../../constants'; 
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useDatabase } from '../../utils/services/database';
+// Replace database import with authService
+import authService from '../../utils/services/authService';
 
 export default function SignUpScreen() {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const { initializeTables, createUser, findUserByEmail } = useDatabase();
   
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isDbReady, setIsDbReady] = useState(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -34,16 +33,6 @@ export default function SignUpScreen() {
     }
   }, [isAuthenticated, router]);
 
-  // Initialize database tables
-  useEffect(() => {
-    const initDb = async () => {
-      const result = await initializeTables();
-      setIsDbReady(result);
-    };
-
-    initDb();
-  }, []);
-
   const handleSignUp = async () => {
     try {
       // Validate inputs
@@ -51,29 +40,28 @@ export default function SignUpScreen() {
         Alert.alert('Error', 'Please fill in all fields');
         return;
       }
-
-      if (!isDbReady) {
-        Alert.alert('Error', 'Database is not ready yet. Please try again.');
+      
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        Alert.alert('Error', 'Please enter a valid email address');
+        return;
+      }
+      
+      // Password validation (at least 6 characters)
+      if (password.length < 6) {
+        Alert.alert('Error', 'Password must be at least 6 characters long');
         return;
       }
       
       setLoading(true);
       
-      // Check if email already exists
-      const existingUser = await findUserByEmail(email);
-      
-      if (existingUser) {
-        setLoading(false);
-        Alert.alert('Error', 'Email already exists');
-        return;
-      }
-      
-      // Create new user
-      const result = await createUser(username, email, password);
+      // Use authService instead of database functions
+      const response = await authService.signup(username, email, password);
       
       setLoading(false);
       
-      if (!result.success) {
+      if (!response) {
         Alert.alert('Error', 'Failed to create account. Please try again.');
         return;
       }
@@ -90,7 +78,16 @@ export default function SignUpScreen() {
       );
     } catch (error) {
       setLoading(false);
-      Alert.alert('Error', 'Failed to create account. Please try again.');
+      
+      let errorMessage = 'Failed to create account. Please try again.';
+      
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -166,7 +163,7 @@ export default function SignUpScreen() {
         {/* Signup Button */}
         <TouchableOpacity 
           onPress={handleSignUp} 
-          disabled={loading || !isDbReady}
+          disabled={loading}
           style={{
             backgroundColor: '#0b8c5c',
             paddingVertical: 12,
@@ -174,7 +171,7 @@ export default function SignUpScreen() {
             alignItems: 'center',
             marginTop: 32,
             marginBottom: 48,
-            opacity: loading || !isDbReady ? 0.7 : 1
+            opacity: loading ? 0.7 : 1
           }}
         >
           {loading ? (

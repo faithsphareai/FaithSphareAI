@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   newTopicButton: {
-    backgroundColor: '#16a34a',
+    backgroundColor: '#0b8c5c',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,

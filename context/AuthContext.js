@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import authService from '../utils/services/authService';
 
 const AuthContext = createContext();
 
@@ -51,6 +52,24 @@ export const AuthProvider = ({ children }) => {
     return user !== null;
   };
 
+  // Add this function to your AuthContext provider
+  const refreshUserData = async () => {
+    try {
+      // Get fresh user data from the server
+      const userData = await authService.getUserData();
+      if (userData) {
+        // Update the user state with fresh data
+        setUser(userData);
+        // Also update AsyncStorage
+        await AsyncStorage.setItem('user', JSON.stringify(userData));
+        return userData;
+      }
+    } catch (error) {
+      console.log('Error refreshing user data:', error);
+    }
+    return null;
+  };
+  
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -58,7 +77,8 @@ export const AuthProvider = ({ children }) => {
       logout, 
       loading, 
       checkUser,
-      isAuthenticated 
+      isAuthenticated,
+      refreshUserData // Add the refreshUserData function to the context
     }}>
       {children}
     </AuthContext.Provider>

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
       borderRadius: 16,
     },
     userBubble: {
-      backgroundColor: '#16a34a',
+      backgroundColor: '#0b8c5c',
     },
     botBubble: {
       backgroundColor: '#E5E5EA',

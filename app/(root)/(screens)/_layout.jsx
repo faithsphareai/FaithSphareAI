@@ -24,11 +24,7 @@ export default function Layout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="namaz-tariqa/index"
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="namaz-tariqa/[prayer]"
+        name="namaz-tariqa"
         options={{ headerShown: false }}
       />
       <Stack.Screen
