@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import PropTypes from 'prop-types';
 
-export const ChatHeader = ({ context, onNewTopic }) => {
+export const ChatHeader = ({ context, onNewTopic, onResetChat }) => {
   const router = useRouter();
 
   return (
@@ -12,12 +12,19 @@ export const ChatHeader = ({ context, onNewTopic }) => {
       <TouchableOpacity onPress={() => router.back()}>
         <Ionicons name="arrow-back" size={24} color="#15803d" />
       </TouchableOpacity>
+
       <Text style={styles.title}>{context}</Text>
+
       {context === 'Islamic Quiz' && (
         <TouchableOpacity onPress={onNewTopic} style={styles.newTopicButton}>
           <Text style={styles.newTopicText}>New Topic</Text>
         </TouchableOpacity>
       )}
+
+      {/* Reset icon button */}
+      <TouchableOpacity onPress={onResetChat}  className="p-2 rounded-full bg-green-50">
+        <Ionicons name="refresh" size={24} color="#15803d" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -25,6 +32,7 @@ export const ChatHeader = ({ context, onNewTopic }) => {
 ChatHeader.propTypes = {
   context: PropTypes.string.isRequired,
   onNewTopic: PropTypes.func,
+  onResetChat: PropTypes.func, // Required for reset button
 };
 
 const styles = StyleSheet.create({
@@ -48,6 +56,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    marginRight: 12,
   },
   newTopicText: {
     color: '#fff',

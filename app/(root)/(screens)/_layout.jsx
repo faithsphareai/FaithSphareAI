@@ -28,6 +28,23 @@ export default function Layout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="monthly-prayer-timings"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="get-nearby-mosques"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="mosque-modal"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          animation: 'fade'
+        }}
+      />
+      <Stack.Screen
         name="chatbot"
         options={({ route }) => ({
           headerShown: false,

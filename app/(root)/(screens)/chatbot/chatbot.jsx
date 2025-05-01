@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChatHeader } from '../../../../components/ChatHeader';
 import { ChatBubble } from '../../../../components/ChatBubble';
@@ -8,13 +8,14 @@ import { ChatProvider, useChat } from '../../../../context/ChatContext';
 import { FlatList } from 'react-native';
 import PropTypes from 'prop-types';
 import { useChatActions } from '../../../../hooks/useChatActions';
+import LanguageSelectorModal from '../../../../components/LanguageSelector';
 
 const ChatbotScreenContent = ({ chatContext, title }) => {
   const { messages, clearMessages } = useChat();
   const { sendMessage, startNewQuiz } = useChatActions();
   const flatListRef = useRef(null);
+  const [languageModalVisible, setLanguageModalVisible] = useState(true); // Show on load
 
-  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (flatListRef.current && messages.length > 0) {
       flatListRef.current.scrollToEnd({ animated: true });
@@ -41,9 +42,14 @@ const ChatbotScreenContent = ({ chatContext, title }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <LanguageSelectorModal
+        visible={languageModalVisible}
+        onClose={() => setLanguageModalVisible(false)}
+      />
       <ChatHeader 
         context={title} 
         onNewTopic={handleNewTopic}
+        onResetChat={clearMessages}
       />
       <FlatList
         ref={flatListRef}

@@ -44,14 +44,14 @@ export default function RootLayout() {
           databaseName={DATABASE_NAME}
           options={{ enableChangeListener: true }}
           useSuspense={false}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <StatusBar style="light" />
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="(root)" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            </Stack>
-          </GestureHandlerRootView>
+              <GestureHandlerRootView style={{ flex: 1 }}>
+                <StatusBar style="light" />
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="(root)" options={{ headerShown: false }} />
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                </Stack>
+              </GestureHandlerRootView>
         </SQLiteProvider>
       </AuthProvider>
     </QueryClientProvider>

@@ -129,6 +129,30 @@ export default function HomeScreen() {
       },
       image: require('../../../assets/quranAuthVector.jpg'),
     },
+    {
+      title: 'Monthly Prayer Timings',
+      // route: {
+      //   pathname: '/monthly-prayer-timings',
+      //   params: {
+      //     chatContext: 'quran',
+      //     title: 'Quran Ayat Authentication'
+      //   }
+      // },
+      route:"/monthly-prayer-timings",
+      image: require('../../../assets/quranAuthVector.jpg'),
+    },
+    {
+      title: 'Get Nearby Mosques',
+      // route: {
+      //   pathname: '/monthly-prayer-timings',
+      //   params: {
+      //     chatContext: 'quran',
+      //     title: 'Quran Ayat Authentication'
+      //   }
+      // },
+      route:"/get-nearby-mosques",
+      image: require('../../../assets/hadithAuthVector.jpg'),
+    },
   ];
 
   // Update the handleButtonPress function to include profile navigation

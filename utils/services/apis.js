@@ -1,9 +1,17 @@
 // utils/services/apis.js
+
 import axios from 'axios';
 
 const BASE_URL = 'https://hammad712-urdu-ocr-app.hf.space';
 const BASE_URL2 = 'https://hammad712-recitation-compare.hf.space';
-const AYAT_FINDER_URL = 'https://hammad712-ayat-finder.hf.space/query';
+
+// Ayat Finder API URLs
+const AYAT_FINDER_URL_ENGLISH= 'https://hammad712-ayat-finder.hf.space/query';
+const AYAT_FINDER_URL_ARABIC = 'https://hammad712-arabic-ayat.hf.space/query';
+
+// Add new constant for Hadith Finder API
+const HADITH_FINDER_URL_ENGLISH = 'https://hammad712-hadith-finder.hf.space/query';
+const HADITH_FINDER_URL_ARABIC = 'https://hammad712-arabic-hadith.hf.space/query';
 
 
 const API_ENDPOINTS = {
@@ -99,10 +107,15 @@ export const compareDTW = async (originalAudio, userAudio) => {
  * @param {string} question
  * @returns {Promise<string>} The answer from the API.
  */
-export const getAyatAnswer = async (question) => {
+export const getAyatAnswer = async (question, language) => {
+  const url = language === 'ar' ? AYAT_FINDER_URL_ARABIC : AYAT_FINDER_URL_ENGLISH;
+
+  console.log("url using", url)
+  console.log("language", language)
+
   try {
     const response = await axios.post(
-      AYAT_FINDER_URL,
+      url,
       { question },
       {
         headers: {
@@ -194,18 +207,21 @@ const handleApiError = (error, service) => {
   }
 };
 
-// Add new constant for Hadith Finder API
-const HADITH_FINDER_URL = 'https://hammad712-hadith-finder.hf.space/query';
 
 /**
  * Sends a question to the Hadith Finder API and returns the answer
  * @param {string} question - The hadith query
  * @returns {Promise<string>} The answer from the API
  */
-export const getHadithAnswer = async (question) => {
+export const getHadithAnswer = async (question, language) => {
+  const url = language === 'ar' ? HADITH_FINDER_URL_ARABIC : HADITH_FINDER_URL_ENGLISH;
+
+  console.log("url using", url);
+  console.log("language", language);
+  
   try {
     const response = await axios.post(
-      HADITH_FINDER_URL,
+      url,
       { question },
       {
         headers: {
@@ -224,5 +240,88 @@ export const getHadithAnswer = async (question) => {
   } catch (error) {
     console.error('Hadith Finder API Error:', error);
     throw handleApiError(error, 'Hadith Finder');
+  }
+};
+
+
+// Add new constant for Aladhan API
+const ALADHAN_API_URL = 'https://api.aladhan.com/v1/calendar';
+
+/**
+ * Fetches prayer times from the Aladhan API based on coordinates and date
+ * @param {Object} coords - The coordinates object containing latitude and longitude
+ * @param {number} year - The year for which prayer times are needed
+ * @param {number} month - The month (1-12) for which prayer times are needed
+ * @param {number} method - The calculation method (default is 1)
+ * @param {number} school - The school of thought (0 or 1)
+ * @returns {Promise<Object>} The prayer times calendar data
+ */
+export const getPrayerCalendar = async (coords, year, month, method = 1, school = 0) => {
+  try {
+    const response = await axios.get(`${ALADHAN_API_URL}/${year}/${month}`, {
+      params: {
+        latitude: coords.coords.latitude,
+        longitude: coords.coords.longitude,
+        method,
+        school,
+      },
+      timeout: 10000,
+    });
+
+    if (!response.data || response.data.code !== 200 || !response.data.data) {
+      throw new Error('Invalid response format from Aladhan API');
+    }
+
+    return response.data.data;
+  } catch (error) {
+    console.error('Aladhan API Error:', error);
+    throw handleApiError(error, 'Aladhan');
+  }
+};
+
+// Constants
+const RAPIDAPI_MAP_URL = 'https://maps-data.p.rapidapi.com/nearby.php';
+
+/**
+ * Fetches nearby mosques using the RapidAPI Maps Data API
+ * @param {Object} coords - Coordinates object containing latitude and longitude
+ * @param {number} limit - Maximum number of results to return (default: 10)
+ * @param {number} zoom - Map zoom level (default: 10)
+ * @returns {Promise<Array>} Array of nearby mosque data
+ */
+export const getNearByMosques = async (coords, limit = 10, zoom = 10) => {
+  try {
+    const response = await axios.get(RAPIDAPI_MAP_URL, {
+      params: {
+        query: 'masjid',
+        lat: coords.coords.latitude,
+        lng: coords.coords.longitude,
+        limit,
+        zoom,
+      },
+      headers: {
+        'X-RapidAPI-Key': 'dbbd245e5fmsh2db3402603f064cp14156bjsnd0e7bd00dc0a',
+        'X-RapidAPI-Host': 'maps-data.p.rapidapi.com'
+      },
+      timeout: 10000
+    });
+
+    if (!response.data?.data) {
+      throw new Error('Invalid response format from Maps Data API');
+    }
+
+    return response.data.data.map(item => ({
+      name: item.name,
+      lat: item.latitude,
+      long: item.longitude,
+      fullAddress: item.full_address,
+      photos: item.photos || [],
+      rating: item.rating,
+      openNow: item.open_now
+    }));
+    
+  } catch (error) {
+    console.error('Maps Data API Error:', error);
+    throw handleApiError(error, 'Maps Data');
   }
 };
