@@ -139,7 +139,7 @@ export default function HomeScreen() {
       //   }
       // },
       route:"/monthly-prayer-timings",
-      image: require('../../../assets/quranAuthVector.jpg'),
+      image: require('../../../assets/islamicCalander.png'),
     },
     {
       title: 'Get Nearby Mosques',
@@ -151,7 +151,7 @@ export default function HomeScreen() {
       //   }
       // },
       route:"/get-nearby-mosques",
-      image: require('../../../assets/hadithAuthVector.jpg'),
+      image: require('../../../assets/mosqueMap.png'),
     },
   ];
 
