@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export const ChatInput = ({ onSend }) => {
+export const ChatInput = ({ onSend,  buttonLabel = 'Send'  }) => {
   const [message, setMessage] = useState('');
 
   const handleSend = () => {
@@ -25,7 +25,7 @@ export const ChatInput = ({ onSend }) => {
         style={styles.sendButton}
         onPress={handleSend}
       >
-        <Text style={styles.sendButtonText}>Send</Text>
+        <Text style={styles.sendButtonText}>{buttonLabel}</Text>
       </TouchableOpacity>
     </View>
   );

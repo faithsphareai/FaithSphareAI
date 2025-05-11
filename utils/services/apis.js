@@ -19,6 +19,20 @@ const API_ENDPOINTS = {
   COMPARE_DTW: '/compare-dtw'
 };
 
+// Helper function for error handling
+const handleApiError = (error, service) => {
+  if (error.response) {
+    return new Error(
+      `${service} server error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`
+    );
+  } else if (error.request) {
+    return new Error(`No response from ${service} service. Please check your internet connection.`);
+  } else {
+    return new Error(`${service} request failed: ${error.message}`);
+  }
+};
+
+
 export const extractTextFromFile = async (fileUri, fileType) => {
   try {
     const formData = new FormData();
@@ -141,19 +155,21 @@ export const getAyatAnswer = async (question, language) => {
   }
 };
 
-const QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/generate_quiz/';
-const GRADE_QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/grade_quiz/';
+const QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/quiz';
+const GRADE_QUIZ_API_URL = 'https://hammad712-islamic-quiz.hf.space/grade';
 
 /**
  * Generates a quiz question from the API
  * @param {string} search_query - The topic or context for the quiz
  * @returns {Promise<string>} The quiz question
- */
+*/
+
 export const generateQuiz = async (search_query) => {
+  console.log("search query", search_query);
   try {
     const response = await axios.post(
       QUIZ_API_URL,
-      { search_query },
+      {"question": search_query },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -162,6 +178,8 @@ export const generateQuiz = async (search_query) => {
         timeout: 30000,
       }
     );
+   
+    console.log("gen quiz axiossss error", response);
     return response.data.quiz;
   } catch (error) {
     console.error('Quiz Generation API Error:', error);
@@ -191,19 +209,6 @@ export const gradeQuiz = async (answers) => {
   } catch (error) {
     console.error('Quiz Grading API Error:', error);
     throw handleApiError(error, 'Quiz Grading');
-  }
-};
-
-// Helper function for error handling
-const handleApiError = (error, service) => {
-  if (error.response) {
-    return new Error(
-      `${service} server error: ${error.response.status} - ${error.response.data.message || 'Unknown error'}`
-    );
-  } else if (error.request) {
-    return new Error(`No response from ${service} service. Please check your internet connection.`);
-  } else {
-    return new Error(`${service} request failed: ${error.message}`);
   }
 };
 
@@ -240,6 +245,39 @@ export const getHadithAnswer = async (question, language) => {
   } catch (error) {
     console.error('Hadith Finder API Error:', error);
     throw handleApiError(error, 'Hadith Finder');
+  }
+};
+
+
+const GENERAL_CHATBOT_URL = 'https://hammad712-chatbot.hf.space/query';
+/**
+ * Sends a question to the General Chatbot API and returns the answer
+ * @param {string} question - The query
+ * @returns {Promise<string>} The answer from the API
+ */
+export const getGeneralChatbotAnswer = async (question, language) => {
+ 
+  try {
+    const response = await axios.post(
+      GENERAL_CHATBOT_URL,
+      { question },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+    
+    if (!response.data || !response.data.answer) {
+      throw new Error('Invalid response format from Genral Chatbot API');
+    }
+    
+    return response.data.answer;
+  } catch (error) {
+    console.error('Genral Chatbot API Error:', error);
+    throw handleApiError(error, 'Genral Chatbot');
   }
 };
 

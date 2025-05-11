@@ -18,19 +18,36 @@ import { useRouter } from "expo-router";
 import * as Animatable from "react-native-animatable";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useCompareDTW } from '../../../hooks/useCompareDTW';
+import { useCompareDTW } from "../../../hooks/useCompareDTW";
 import { LinearGradient } from "expo-linear-gradient";
 
-const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
+const AudioBar = ({
+  audio,
+  onPlay,
+  onPause,
+  isPlaying,
+  setAudio,
+  setIslUpload,
+}) => (
   <Animatable.View
     animation="fadeInUp"
     duration={600}
     style={styles.audioBarContainer}
   >
     <LinearGradient
-      colors={['#f0fdf4', '#dcfce7']}
+      colors={["#f0fdf4", "#dcfce7"]}
       style={styles.audioBarGradient}
     >
+      <TouchableOpacity
+        style={styles.removeButton}
+        onPress={() => {
+          setAudio(null);
+          setIslUpload(false);
+          onPause();
+        }}
+      >
+        <Text style={styles.removeButtonText}>×</Text>
+      </TouchableOpacity>
       <Animatable.View
         animation={isPlaying ? "pulse" : undefined}
         iterationCount="infinite"
@@ -43,27 +60,18 @@ const AudioBar = ({ audio, onPlay, onPause, isPlaying }) => (
           style={{ marginRight: 10 }}
         />
       </Animatable.View>
-      <Text
-        numberOfLines={1}
-        style={styles.audioTitle}
-      >
+      <Text numberOfLines={1} style={styles.audioTitle}>
         {audio.name || "Unnamed Audio"}
       </Text>
       {isPlaying ? (
         <Animatable.View animation="bounceIn" duration={300}>
-          <TouchableOpacity
-            onPress={onPause}
-            style={styles.pauseButton}
-          >
+          <TouchableOpacity onPress={onPause} style={styles.pauseButton}>
             <Ionicons name="pause" size={24} color="white" />
           </TouchableOpacity>
         </Animatable.View>
       ) : (
         <Animatable.View animation="bounceIn" duration={300}>
-          <TouchableOpacity
-            onPress={onPlay}
-            style={styles.playButton}
-          >
+          <TouchableOpacity onPress={onPlay} style={styles.playButton}>
             <Ionicons name="play" size={24} color="white" />
           </TouchableOpacity>
         </Animatable.View>
@@ -83,7 +91,6 @@ export default function Recitation() {
   const router = useRouter();
 
   const compareDTWMutation = useCompareDTW();
-
 
   const [originalRecording, setOriginalRecording] = useState();
   const [userRecording, setUserRecording] = useState();
@@ -107,6 +114,10 @@ export default function Recitation() {
         copyToCacheDirectory: true,
       });
 
+      if (result.canceled == true) {
+        return false;
+      }
+
       if (!result.canceled) {
         // Format the file object correctly
         const file = {
@@ -118,10 +129,12 @@ export default function Recitation() {
         };
         setter(file);
         Alert.alert("Success", `Uploaded: ${file.name}`);
+        return true;
       }
     } catch (error) {
       console.error("Audio Upload Error:", error);
       Alert.alert("Error", "Failed to upload audio.");
+      return false;
     }
   };
 
@@ -190,26 +203,28 @@ export default function Recitation() {
       const result = await compareDTWMutation.mutateAsync({
         originalAudio: {
           ...originalAudio,
-          type: originalAudio.name.endsWith('.mp3') ? 'audio/mp3' : 'audio/ogg'
+          type: originalAudio.name.endsWith(".mp3") ? "audio/mp3" : "audio/ogg",
         },
         userAudio: {
           ...userAudio,
-          type: userAudio.name.endsWith('.mp3') ? 'audio/mp3' : 'audio/ogg'
-        }
+          type: userAudio.name.endsWith(".mp3") ? "audio/mp3" : "audio/ogg",
+        },
       });
 
       // Check if result is valid and has the expected properties
-      if (result && typeof result.similarity_score === 'number') {
+      if (result && typeof result.similarity_score === "number") {
         Alert.alert(
           "Similarity Results",
-          `Score: ${result.similarity_score.toFixed(2)}%\n\nInterpretation: ${result.interpretation || "No interpretation available"}`
+          `Score: ${result.similarity_score.toFixed(2)}%\n\nInterpretation: ${
+            result.interpretation || "No interpretation available"
+          }`
         );
       } else {
-        throw new Error('Invalid response format from comparison service');
+        throw new Error("Invalid response format from comparison service");
       }
     } catch (error) {
-      console.error('Full error details:', error);
-      
+      console.error("Full error details:", error);
+
       Alert.alert(
         "Error",
         "An error occurred while comparing the audio files. Please try again later."
@@ -311,23 +326,19 @@ export default function Recitation() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LinearGradient
-        colors={['#ffffff', '#f9fafb']}
-        style={styles.container}
-      >
+      <LinearGradient colors={["#ffffff", "#f9fafb"]} style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBack} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#15803d" />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            Recitation Comparison
-          </Text>
+          <Text style={styles.headerTitle}>Recitation Comparison</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         <View style={styles.introContainer}>
           <Text style={styles.introText}>
-            Compare your recitation with the original to improve your pronunciation and rhythm.
+            Compare your recitation with the original to improve your
+            pronunciation and rhythm.
           </Text>
         </View>
 
@@ -340,13 +351,13 @@ export default function Recitation() {
               <FontAwesome5 name="quran" size={18} color="#15803d" />
               <Text style={styles.sectionTitle}>Original Audio</Text>
             </View>
-            
+
             <View style={styles.optionsRow}>
               {!isOriginalUpload && (
                 <TouchableOpacity
-                  onPress={() => {
-                    pickAudio(setOriginalAudio);
-                    setIsOriginalUpload(true);
+                  onPress={async () => {
+                    const didPick = await pickAudio(setOriginalAudio);
+                    setIsOriginalUpload(didPick);
                   }}
                   style={styles.uploadButton}
                 >
@@ -363,7 +374,11 @@ export default function Recitation() {
                 >
                   <TouchableOpacity
                     onPress={() => recordAudio(true)}
-                    style={isOriginalRecording ? styles.recordingButton : styles.recordButton}
+                    style={
+                      isOriginalRecording
+                        ? styles.recordingButton
+                        : styles.recordButton
+                    }
                   >
                     <Ionicons
                       name={isOriginalRecording ? "stop" : "mic"}
@@ -371,7 +386,11 @@ export default function Recitation() {
                       color={isOriginalRecording ? "#ef4444" : "#16a34a"}
                     />
                     <Text
-                      style={isOriginalRecording ? styles.recordingText : styles.buttonText}
+                      style={
+                        isOriginalRecording
+                          ? styles.recordingText
+                          : styles.buttonText
+                      }
                     >
                       {isOriginalRecording ? "Recording..." : "Record"}
                     </Text>
@@ -386,6 +405,8 @@ export default function Recitation() {
                 onPlay={() => playSound(originalAudio)}
                 onPause={pauseSound}
                 isPlaying={isPlaying && currentlyPlaying === originalAudio}
+                setAudio={setIsOriginalUpload}
+                setIslUpload={setOriginalAudio}
               />
             )}
           </View>
@@ -397,13 +418,13 @@ export default function Recitation() {
               <FontAwesome5 name="microphone-alt" size={18} color="#15803d" />
               <Text style={styles.sectionTitle}>Your Recitation</Text>
             </View>
-            
+
             <View style={styles.optionsRow}>
               {!isUserUpload && (
                 <TouchableOpacity
-                  onPress={() => {
-                    pickAudio(setUserAudio);
-                    setIsUserUpload(true);
+                  onPress={async () => {
+                    const didPick = await pickAudio(setUserAudio);
+                    setIsUserUpload(didPick);
                   }}
                   style={styles.uploadButton}
                 >
@@ -420,7 +441,11 @@ export default function Recitation() {
                 >
                   <TouchableOpacity
                     onPress={() => recordAudio(false)}
-                    style={isUserRecording ? styles.recordingButton : styles.recordButton}
+                    style={
+                      isUserRecording
+                        ? styles.recordingButton
+                        : styles.recordButton
+                    }
                   >
                     <Ionicons
                       name={isUserRecording ? "stop" : "mic"}
@@ -428,7 +453,11 @@ export default function Recitation() {
                       color={isUserRecording ? "#ef4444" : "#16a34a"}
                     />
                     <Text
-                      style={isUserRecording ? styles.recordingText : styles.buttonText}
+                      style={
+                        isUserRecording
+                          ? styles.recordingText
+                          : styles.buttonText
+                      }
                     >
                       {isUserRecording ? "Recording..." : "Record"}
                     </Text>
@@ -443,20 +472,25 @@ export default function Recitation() {
                 onPlay={() => playSound(userAudio)}
                 onPause={pauseSound}
                 isPlaying={isPlaying && currentlyPlaying === userAudio}
+                setAudio={setUserAudio}
+                setIslUpload={setIsUserUpload}
               />
             )}
           </View>
 
           <TouchableOpacity
             onPress={similaritySearch}
-            disabled={compareDTWMutation.isLoading || !originalAudio || !userAudio}
+            disabled={
+              compareDTWMutation.isLoading || !originalAudio || !userAudio
+            }
             style={[
               styles.compareButton,
-              (compareDTWMutation.isLoading || !originalAudio || !userAudio) && styles.disabledButton
+              (compareDTWMutation.isLoading || !originalAudio || !userAudio) &&
+                styles.disabledButton,
             ]}
           >
             <LinearGradient
-              colors={['#15803d', '#166534']}
+              colors={["#15803d", "#166534"]}
               style={styles.compareButtonGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
@@ -469,17 +503,20 @@ export default function Recitation() {
               ) : (
                 <View style={styles.buttonContentRow}>
                   <MaterialIcons name="compare" size={20} color="#ffffff" />
-                  <Text style={styles.compareButtonText}>Compare Recitations</Text>
+                  <Text style={styles.compareButtonText}>
+                    Compare Recitations
+                  </Text>
                 </View>
               )}
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <View style={styles.infoContainer}>
             <Text style={styles.infoTitle}>How it works</Text>
             <Text style={styles.infoText}>
-              Our advanced algorithm compares your recitation with the original, analyzing rhythm, 
-              pronunciation, and timing to provide you with a similarity score.
+              Our advanced algorithm compares your recitation with the original,
+              analyzing rhythm, pronunciation, and timing to provide you with a
+              similarity score.
             </Text>
           </View>
         </ScrollView>
@@ -491,44 +528,44 @@ export default function Recitation() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   container: {
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    backgroundColor: '#fff', 
-    borderColor: '#e5e7eb',
+    backgroundColor: "#fff",
+    borderColor: "#e5e7eb",
   },
   backButton: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: "#f0fdf4",
   },
   headerTitle: {
     flex: 1,
     fontSize: 20,
-    color: '#15803d', 
-    fontWeight: '600',
-    textAlign: 'center',
+    color: "#15803d",
+    fontWeight: "600",
+    textAlign: "center",
   },
   headerSpacer: {
     width: 40,
   },
   introContainer: {
     padding: 16,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: "#f0fdf4",
     borderBottomWidth: 1,
-    borderColor: '#dcfce7',
+    borderColor: "#dcfce7",
   },
   introText: {
     fontSize: 16,
-    color: '#166534',
+    color: "#166534",
     lineHeight: 22,
   },
   scrollContent: {
@@ -536,86 +573,129 @@ const styles = StyleSheet.create({
   },
   sectionContainer: {
     marginBottom: 24,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
   },
   sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 8,
-    color: '#15803d',
+    color: "#15803d",
   },
   divider: {
     height: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: "#e5e7eb",
     marginVertical: 8,
   },
   optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 16,
   },
   uploadButton: {
     borderWidth: 2,
-    borderColor: '#dcfce7',
+    borderColor: "#dcfce7",
     paddingVertical: 16,
     borderRadius: 8,
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginRight: 8,
-    backgroundColor: '#f0fdf4',
+    backgroundColor: "#f0fdf4",
   },
   recordButton: {
     borderWidth: 2,
-    borderColor: '#dcfce7',
+    borderColor: "#dcfce7",
     paddingVertical: 16,
     borderRadius: 8,
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f0fdf4',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f0fdf4",
   },
   recordingButton: {
     borderWidth: 2,
-    borderColor: '#fecaca',
+    borderColor: "#fecaca",
     paddingVertical: 16,
     borderRadius: 8,
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fef2f2',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fef2f2",
   },
+
+  audioPreviewContainer: {
+    marginTop: 12,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    position: "relative",
+    backgroundColor: "#f9fafb",
+  },
+  removeButton: {
+    position: "absolute",
+    top: 4,
+    left: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+  },
+  removeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    lineHeight: 18,
+    fontWeight: "bold",
+  },
+  audioInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  audioName: {
+    flex: 1,
+    marginHorizontal: 8,
+    color: "#111827",
+  },
+  playButton: {
+    backgroundColor: "#15803d",
+    padding: 6,
+    borderRadius: 4,
+  },
+
   buttonText: {
     fontSize: 16,
     marginTop: 8,
-    color: '#166534',
-    fontWeight: '500',
+    color: "#166534",
+    fontWeight: "500",
   },
   recordingText: {
     fontSize: 16,
     marginTop: 8,
-    color: '#ef4444',
-    fontWeight: '500',
+    color: "#ef4444",
+    fontWeight: "500",
   },
   audioBarContainer: {
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   audioBarGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderRadius: 8,
   },
@@ -623,30 +703,30 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#166534',
+    fontWeight: "500",
+    color: "#166534",
   },
   playButton: {
-    backgroundColor: '#16a34a',
+    backgroundColor: "#16a34a",
     borderRadius: 20,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
   },
   pauseButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: "#ef4444",
     borderRadius: 20,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -654,10 +734,10 @@ const styles = StyleSheet.create({
   },
   compareButton: {
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginTop: 8,
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
@@ -665,7 +745,7 @@ const styles = StyleSheet.create({
   },
   compareButtonGradient: {
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   disabledButton: {
     opacity: 0.5,
@@ -674,39 +754,39 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
   buttonContentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
   compareButtonText: {
-    color: '#ffffff',
+    color: "#ffffff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginLeft: 8,
   },
   infoContainer: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: "#f8fafc",
     padding: 16,
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#15803d',
+    borderLeftColor: "#15803d",
     marginBottom: 24,
   },
   infoTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#15803d',
+    fontWeight: "600",
+    color: "#15803d",
     marginBottom: 8,
   },
   infoText: {
     fontSize: 14,
-    color: '#4b5563',
+    color: "#4b5563",
     lineHeight: 20,
   },
 });

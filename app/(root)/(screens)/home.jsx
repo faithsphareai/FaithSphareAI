@@ -130,26 +130,23 @@ export default function HomeScreen() {
       image: require('../../../assets/quranAuthVector.jpg'),
     },
     {
+      title: 'General Chatbot',
+      route: {
+        pathname: '/chatbot',
+        params: {
+          chatContext: 'generalChatbot',
+          title: 'General Chatbot'
+        }
+      },
+      image: require('../../../assets/messages.png'),
+    },
+    {
       title: 'Monthly Prayer Timings',
-      // route: {
-      //   pathname: '/monthly-prayer-timings',
-      //   params: {
-      //     chatContext: 'quran',
-      //     title: 'Quran Ayat Authentication'
-      //   }
-      // },
       route:"/monthly-prayer-timings",
       image: require('../../../assets/islamicCalander.png'),
     },
     {
       title: 'Get Nearby Mosques',
-      // route: {
-      //   pathname: '/monthly-prayer-timings',
-      //   params: {
-      //     chatContext: 'quran',
-      //     title: 'Quran Ayat Authentication'
-      //   }
-      // },
       route:"/get-nearby-mosques",
       image: require('../../../assets/mosqueMap.png'),
     },
