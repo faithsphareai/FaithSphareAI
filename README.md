@@ -15,7 +15,7 @@
 </p>
 
 <p align="center">
-  <a href="https://expo.dev/accounts/shahabali061/projects/islam-app/builds/01a07bf1-f853-4f56-a6aa-fdc4d16821cd" target="_blank">
+  <a href="https://drive.google.com/file/d/1LFSZwC9GKnLPxmlZECuk9Wnne8ieLZZG/view?usp=sharing" target="_blank">
     <img src="https://img.shields.io/badge/🚀%20LIVE%20APP-CLICK%20HERE-informational?style=for-the-badge&logo=expo"/>
   </a>
 </p>
@@ -111,7 +111,7 @@ Find **nearby mosques** using GPS and Google Maps:
 
 ## 📱 Deployed App
 
-> **🔗 [Click here to try the LIVE APP](https://expo.dev/accounts/shahabali061/projects/islam-app/builds/01a07bf1-f853-4f56-a6aa-fdc4d16821cd)**  
+> **🔗 [Click here to try the LIVE APP](https://drive.google.com/file/d/1LFSZwC9GKnLPxmlZECuk9Wnne8ieLZZG/view?usp=sharing)**  
 > No installation required — open on your mobile via Expo Go! 📲
 
 ---
